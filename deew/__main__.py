@@ -333,15 +333,15 @@ def convert_delay_to_ms(inp, compensate):
     negative = inp.startswith(('-'))
 
     if '@' in inp:
-        frame = round(float(re.sub('[^0-9\.]', '', inp.split('@')[0])))
+        frame = round(float(re.sub(r'[^0-9\.]', '', inp.split('@')[0])))
         if not frame: print_exit('delay')
 
         fps = str(inp.split('@')[1])
         if fps == 'ntsc': fps = str(24000 / 1001)
         if fps == 'pal': fps = str(25)
         if '/' in fps:
-            divident = re.sub('[^0-9\.]', '', fps.split('/')[0])
-            divisor = re.sub('[^0-9\.]', '', fps.split('/')[1])
+            divident = re.sub(r'[^0-9\.]', '', fps.split('/')[0])
+            divisor = re.sub(r'[^0-9\.]', '', fps.split('/')[1])
             if not divident or not divisor: print_exit('delay')
             fps = float(divident) / float(divisor)
         delay = frame / float(fps) * 1000
@@ -350,9 +350,9 @@ def convert_delay_to_ms(inp, compensate):
         if not inp.count('.') < 2: print_exit('delay')
 
         if inp.endswith('ms'):
-            delay = float(re.sub('[^0-9\.]', '', inp))
+            delay = float(re.sub(r'[^0-9\.]', '', inp))
         else:
-            delay = float(re.sub('[^0-9\.]', '', inp)) * 1000
+            delay = float(re.sub(r'[^0-9\.]', '', inp)) * 1000
 
     delay = float(f'-{delay}' if negative else f'+{delay}')
     delay_print = f'{format(delay, ".3f")} ms'
@@ -858,7 +858,7 @@ def main() -> None:
             '-precision', '28',
             '-cutoff', '1',
             '-dither_scale', '0']
-        resample_args_print = f'-filter_complex [bold color(231)]"\[a:{trackindex}]{channel_swap}aresample=resampler=soxr"[/bold color(231)] \
+        resample_args_print = rf'-filter_complex [bold color(231)]"\[a:{trackindex}]{channel_swap}aresample=resampler=soxr"[/bold color(231)] \
 -ar [bold color(231)]{resample_value}[/bold color(231)] \
 -precision [bold color(231)]28[/bold color(231)] \
 -cutoff [bold color(231)]1[/bold color(231)] \
@@ -869,7 +869,7 @@ def main() -> None:
 
     if channels == 8 and not resample_args:
         channel_swap_args = ['-filter_complex', f'[a:{trackindex}]pan=7.1|c0=c0|c1=c1|c2=c2|c3=c3|c4=c6|c5=c7|c6=c4|c7=c5']
-        channel_swap_args_print = f'-filter_complex [bold color(231)]"\[a:{trackindex}]pan=7.1|c0=c0|c1=c1|c2=c2|c3=c3|c4=c6|c5=c7|c6=c4|c7=c5"[/bold color(231)] '
+        channel_swap_args_print = rf'-filter_complex [bold color(231)]"\[a:{trackindex}]pan=7.1|c0=c0|c1=c1|c2=c2|c3=c3|c4=c6|c5=c7|c6=c4|c7=c5"[/bold color(231)] '
     else:
         channel_swap_args = []
         channel_swap_args_print = ''
@@ -915,7 +915,7 @@ def main() -> None:
             *(xml_validation)
         ]
 
-        ffmpeg_args_print = f'[bold cyan]ffmpeg[/bold cyan] \
+        ffmpeg_args_print = rf'[bold cyan]ffmpeg[/bold cyan] \
 -y \
 -drc_scale [bold color(231)]0[/bold color(231)] \
 -i [bold green]{filelist[i]}[/bold green] \
@@ -925,7 +925,7 @@ def main() -> None:
 -rf64 [bold color(231)]always[/bold color(231)] \
 [bold magenta]{os.path.join(config["temp_path"], basename(filelist[i], "wav"))}[/bold magenta]'
 
-        ffmpeg_args_print_short = f'[bold cyan]ffmpeg[/bold cyan] \
+        ffmpeg_args_print_short = rf'[bold cyan]ffmpeg[/bold cyan] \
 -y \
 -drc_scale [bold color(231)]0[/bold color(231)] \
 -i [bold green]\[input][/bold green] \
@@ -936,7 +936,7 @@ def main() -> None:
 [bold magenta]\[output][/bold magenta]'
 
         dee_args_print = f'[bold cyan]dee[/bold cyan] -x [bold magenta]{dee_xml_input}[/bold magenta]{xml_validation_print}'
-        dee_args_print_short = f'[bold cyan]dee[/bold cyan] -x [bold magenta]\[input][/bold magenta]{xml_validation_print}'
+        dee_args_print_short = f'[bold cyan]dee[/bold cyan] -x [bold magenta]\\[input][/bold magenta]{xml_validation_print}'
 
         intermediate_exists = False
         if os.path.exists(os.path.join(config['temp_path'], basename(filelist[i], 'wav'))):
